@@ -1,0 +1,414 @@
+#+TITLE: MECH 325 Midterm 1 Info Sheet
+#+OPTIONS: H:5 num:t
+#+LATEX_HEADER: \usepackage{steinmetz}
+#+LATEX_HEADER: \usepackage{siunitx}
+#+LATEX_HEADER: \usepackage{tocloft}
+#+LATEX_HEADER: \usepackage{amsmath}
+
+#+LATEX_HEADER: \setlength{\parindent}{0pt}
+#+LATEX_HEADER: \newcounter{eqnsec}
+#+LATEX_HEADER: \newcounter{figuresec}
+#+LATEX_HEADER: \newcounter{figurenum}
+
+#+LATEX_HEADER: \renewcommand{\theequation}{\theeqnsec-\arabic{equation}}
+#+LATEX_HEADER: \renewcommand{\thefigure}{\thefiguresec-\thefigurenum}
+
+#+LATEX_HEADER: \DeclareSIUnit\inch{in}
+
+#+LATEX_HEADER: \setcounter{secnumdepth}{5}
+#+LATEX_HEADER: \input{equations_header}
+
+\listofmyequations
+
+* AGMA Analysis
+** Spur Gear Bending
+*** Quick Reference
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{17}
+#+CAPTION: Roadmap of gear bending equations based on AGMA Standards (pg. 758) \label{fig:quickref-bending}
+#+ATTR_LATEX: :width 0.9\textwidth :placement [H]
+[[file:res/agma_spur_bending.svg]]
+** Spur Gear Wear
+*** Quick Reference
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{18}
+#+CAPTION: Roadmap of gear wear equations based on AGMA Standards (pg. 759) \label{fig:quickref-wear}
+#+ATTR_LATEX: :width 0.9\textwidth :placement [H]
+[[file:res/agma_spur_wear.svg]]
+** Factors
+*** Geometry Factors $I$ and $J$ ($Z_I$ and $Y_J$)
+\setcounter{eqnsec}{14}
+\setcounter{equation}{18}
+\begin{equation}
+m_F = \frac{F}{p_x}
+\end{equation}
+\myequations{Face contact ratio $m_F$}{743}
+
+Where:
+\begin{align*}
+m_F &= \text{Face contact ratio} \\
+F &= \text{Face width} \\
+p_x &= \text{Axial pitch (distance between teeth measured along axial direction} \\
+\end{align*}
+For spur gears, $p_x = \infty \Rightarrow m_F = 0$.
+**** Bending-Strength Geometry Factor $J ($Y_J$)
+\hspace{0pt}
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{6}
+#+CAPTION: Spur-gear geometry factors J for gears with \SI{20}{\degree} pressure angle (pg. 745)
+#+ATTR_LATEX: :width 0.9\textwidth :placement [H]
+[[file:res/bending_strength_factor_j.svg]]
+**** Surface-Strength Geometry Factor $I$ ($Z_J$)
+\setcounter{eqnsec}{14}
+\setcounter{equation}{20}
+\begin{align}
+m_N &= \frac{p_N}{0.95Z} \\
+m_G &= \frac{N_G}{N_P} = \frac{d_G}{d_P} \\
+I &=
+\begin{cases}
+\frac{\cos \phi_t \sin \phi_t}{2m_N} \frac{m_G}{m_G + 1} & \text{external gears} \\
+\frac{\cos \phi_t \sin \phi_t}{2m_N} \frac{m_G}{m_G - 1} & \text{internal gears}
+\end{cases}
+\end{align}
+\myequations{Formula for strength geometry factor $I$}{745-747}
+
+Where:
+\begin{align*}
+m_N &= \text{Load sharing ratio (1 for spur gears)} \\
+p_N &= \text{normal base pitch} \\
+Z &= \text{length of line of action in transverse page (distance $L_{ab}$ in Fig. 13-15, pg.676)} 
+\end{align*}
+*** Elastic Coefficient $C_p$ ($Z_E$)
+\setcounter{eqnsec}{14}
+\setcounter{equation}{12}
+\begin{equation}
+C_p = \left[
+    \pi \left(
+        \frac{1 - v_P^2}{E_P} + \frac{1 - v_G^2}{E_G}
+    \right)
+\right]^{-1/2}
+\end{equation}
+\myequations{Elastic Coefficient $C_p$}{736}
+
+Where:
+\begin{align*}
+v &= \text{Poisson's ratio} \\
+E &= \text{Elastic Modulus} \\
+\end{align*}
+
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{8}
+#+CAPTION: Elastic Coefficient $C_p$ ($Z_E$), $\sqrt{\text{psi}}$, ($\sqrt{\text{MPa}}$), (pg. 749)
+#+ATTR_LATEX: :width \textwidth :placement [H]
+[[file:res/elastic_coefficient.svg]]
+*** Dynamic Factor $K_v$
+\setcounter{eqnsec}{14}
+\setcounter{equation}{26}
+\begin{align}
+K_v &=
+\begin{cases}
+\left(\frac{A + \sqrt{V}}{A}\right)^B & \text{$V$ in ft/min} \\
+\left(\frac{A + \sqrt{200V}}{A}\right)^B & \text{$V$ in m/s} \\
+\end{cases} \\
+\begin{split}
+A &= 50 + 56(1 - B) \\
+B &= 0.25(12 - Q_v)^{2/3}
+\end{split}
+\end{align}
+\myequations{Dynamic factor $K_v$}{748}
+
+\setcounter{eqnsec}{14}
+\setcounter{equation}{28}
+\begin{align}
+(V_t)_\text{max} &=
+\begin{cases}
+[A + (Q_v - 3)]^2 & \text{ft/min} \\
+\frac{[A + (Q_v - 3)]^2}{200} & \text{m/s}
+\end{cases}
+\end{align}
+\myequations{Max pitch-line velocity}{50}
+
+Where:
+\begin{align*}
+Q_v &= \text{Quality number (3-7 for commercial grade, 8-12 for precision)}
+\end{align*}
+*** Overload Factor $K_o$
+See \autoref{fig:quickref-bending} or \autoref{fig:quickref-wear} on pages \pageref{fig:quickref-bending} and \pageref{fig:quickref-wear}.
+*** Surface Condition Factor $C_f$ ($Z_R$)
+Use $C_f = 1$ unless given.
+*** Size Factor $K_s$
+$K_s$ can be taken as 1 or calculated as follows:
+
+\begin{equation*}
+K_s = 1.192 \left(\frac{F \sqrt{Y}}{P}\right)^{0.0535}
+\end{equation*}
+\myequations{Size factor $K_s$}{50}
+
+Where:
+\begin{align*}
+F &= \text{Face width} \\
+P &= \text{diametral pitch, teeth per inch} \\
+Y &= \text{Lewis Form Factor, see \autoref{fig:lewis-ff}, page \pageref{fig:lewis-ff}}
+\end{align*}
+
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{2}
+#+CAPTION: Values of the Lewis Form Factor $Y$ for a normal pressure angle of \SI{20}{\degree}, full-depth teeth, diametral pitch of unity in the plane of rotation), (pg. 730) \label{fig:lewis-ff}
+#+ATTR_LATEX: :width 0.4\textwidth :placement [H]
+[[file:res/lewis_form_table.svg]]
+*** Load-Distribution Factor $K_m$ ($K_H$)
+Values only applicable to:
+- Net face width to pinion pitch diameter ratio $F/d_P \leq 2$
+- Gear elements mounted between the bearings
+- Face widths up to \SI{40}{\inch}
+- Contact, when loaded, across full width of narrowest member
+
+\setcounter{eqnsec}{14}
+\setcounter{equation}{29}
+\begin{align}
+K_m &= C_{mf} = 1 + C_{mc}(C_{pf} C_{pm} + C_{ma} C_e) \\
+C_{mc} &= 
+\begin{cases}
+1 & \text{for uncrowned teeth} \\
+0.8 & \text{for crowned teeth}
+\end{cases} \\
+C_{pf} &=
+\begin{cases}
+0.05 & F/(10d_P) < 0.05 \\
+\frac{F}{10d_P} - 0.025 & F \leq \SI{1}{\inch} \\
+\frac{F}{10d_P} - 0.0375 + 0.0125F & 1 < F \leq \SI{17}{\inch} \\
+\frac{F}{10d_P} - 0.1109 + 0.0207F - 0.000228F^2 & 17 < F \leq \SI{40}{\inch}
+\end{cases} \\
+C_{pm} &=
+\begin{cases}
+1 & \text{for straddle-mounted pinion with $S_1/S < 0.175$ (see \autoref{fig:straddle-mount} on page \pageref{fig:straddle-mount})} \\
+1.1 & \text{otherwise}
+\end{cases} \\
+C_{ma} &= A + BF + CF^2 \text{\hspace{24pt}(see \autoref{fig:C-ma} on page \pageref{fig:C-ma})} \\
+C_e &=
+\begin{cases}
+0.8 & \text{gearing adjusted at assembly or compatibility is improved by lapping} \\
+1 & \text{otherwise}
+\end{cases}
+\end{align}
+\myequations{Load-distribution factor $K_m$}{751-752}
+
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{9}
+#+CAPTION: Empircal Constants $A$, $B$, and $C$ for face width $F$ in inches (pg. 752) \label{fig:C-ma}
+#+ATTR_LATEX: :width 0.7\textwidth :placement [H]
+[[file:res/c_ma_factors.svg]]
+
+\setcounter{figurenum}{10}
+#+CAPTION: Definition of distances $S$ and $S_1$ (pg. 752) \label{fig:straddle-mount}
+#+ATTR_LATEX: :width 0.5\textwidth :placement [H]
+[[file:res/straddle_mount.svg]]
+*** Hardness-Ratio Factor $C_H$ ($Z_W$)
+For the pinion, $C_H = 1$, for the gear, calculate $C_H$ using:
+
+\setcounter{eqnsec}{14}
+\setcounter{equation}{35}
+\begin{align}
+C_H &= 1.0 + A'(m_G - 1.0) \\
+A' &=
+\begin{cases}
+0 & H_{BP}/H_{BG} < 1.2 \\
+8.98\cdot10^{-3}\left(\frac{H_{BP}}{H_{BG}}\right) - 8.29\cdot10^{-3} & 1.2 \leq H_{BP}/H_{BG} < 1.7 \\
+0.00698 & H_{BP}/H_{BG} > 1.7 
+\end{cases} \notag
+\end{align}
+\myequations{Hardness-Ratio Factor $C_H$}{753}
+*** Stress-Cycle Factors $Y_N$ and $Z_N$
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{14}
+#+CAPTION:  Repeatedly applied bending strength stress-cycle factor $Y_N$ (pg. 755)
+#+ATTR_LATEX: :width 0.7\textwidth :placement [H]
+[[file:res/stress_cycle_factor_Y_N.svg]]
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{15}
+#+CAPTION:  Pitting resistance stress-cycle factor $Z_N$ (pg. 755)
+#+ATTR_LATEX: :width 0.7\textwidth :placement [H]
+[[file:res/stress_cycle_factor_Z_N.svg]]
+*** Reliability Factor $K_R$ ($Y_Z$)
+Use the given equation or the table to find $K_R$:
+\setcounter{eqnsec}{14}
+\setcounter{equation}{37}
+\begin{equation}
+K_R = 
+\begin{cases}
+0.658 - 0.0759 \ln(1 - R) & 0.5 < R < 0.99 \\
+0.50 - 0.109 \ln(1 - R) & 0.99 \leq R \leq 0.9999 \\
+\end{cases}
+\end{equation}
+\myequations{Approximation of Reliability factor $K_R$}{755}
+
+\setcounter{figuresec}{14}
+\setcounter{figurenum}{10}
+#+CAPTION:  Reliabilty Factors $K_R$ ($Y_Z$) (pg. 756)
+#+ATTR_LATEX: :width 0.3\textwidth :placement [H]
+[[file:res/reliability_factor.svg]]
+*** Temperature Factor $K_T$ ($Y_\theta$)
+Use $K_T = 1 $ unless given.
+*** Rim-Thickness Factor $K_B$
+\setcounter{eqnsec}{14}
+\setcounter{equation}{38}
+\begin{align}
+\m_B &= \frac{t_R}{h_t} \\
+K_B &=
+\begin{cases}
+1.6 \ln\left(\frac{2.242}{m_B}\right) & m_B < 1.2 \\
+1 & m_B \geq 1.2
+\end{cases}
+\end{align}
+\myequations{Rim-Thickness Factor $K_B$}{756}
+
+Where:
+\begin{align*}
+m_B &= \text{Backup ratio} \\
+t_R &= \text{Rim thickness} \\
+h_t &= \text{Tooth height}
+\end{align*}
+
+* Gears
+** Conjugate Action
+Conjugate action is when meshing gears have constant angular velocity.
+The involute profile is a geometry that achieves this.
+** Interference
+Interference occurs when meshing gears are not conjugate
+(i.e. teeth contacting along points that are not involute)
+See \autoref{eq:min_teeth_pinion} on page \pageref{eq:min_teeth_pinion}.
+** Ratio
+Driving over driven
+** Equations
+\setcounter{eqnsec}{13}
+\setcounter{equation}{0}
+\begin{align}
+P &= \frac{N}{d} \\
+m &= \frac{d}{N} \\
+p &= \frac{\pi d}{N} = \pi m \\
+pP &= \pi
+\end{align}
+\myequations{Common Gear Geometry relations}{667}
+
+Where:
+\begin{align*}
+P &= \text{diametral pitch, teeth per inch} \\
+N &= \text{number of teeth} \\
+d &= \text{pitch diameter, inch or mm} \\
+m &= \text{module, mm} \\
+p &= \text{circular pitch, inch or mm} \\
+\end{align*}
+
+\setcounter{eqnsec}{13}
+\setcounter{equation}{9}
+\begin{equation}
+N_p = \frac{2k}{3\sin^2(\phi)}\left(1 + \sqrt{1 + 3 \sin^2(\phi)}\right)
+\label{eq:min_teeth_pinion}
+\end{equation}
+\myequations{Minimum number of pinion teeth for interference-free meshing}{678}
+
+Where:
+\begin{align*}
+N_p &= \text{Number of pinion teeth} \\
+k &= \text{1 for full-depth teeth, 0.8 for stub teeth} \\
+\phi &= \text{pressure angle} \\
+\end{align*}
+* Power Screws
+** Equations
+\setcounter{eqnsec}{8}
+\setcounter{equation}{0}
+\begin{align}
+T_R = \frac{F d_m}{2} \left(\frac{l + \pi f d_m}{\pi d_m - fl}\right) \\
+T_L = \frac{F d_m}{2} \left(\frac{\pi f d_m - l}{\pi d_m + fl}\right)
+\end{align}
+\myequations{Torque required for raising and lower load against force}{408}
+
+\begin{align}
+\pi f d_m & > l \notag \\ 
+f &> \tan{\lambda}
+\end{align}
+\myequations{Condition for self-locking}{408}
+
+Where:
+\begin{align*}
+T_R &= \text{Torque required to raise load} \\
+T_L &= \text{Torque required to lower load} \\
+f &= \text{Friction factor between screw and nut} \\
+d_m &= \text{Average diameter of screw}
+F &= \text{Compressive force on screw} \\
+l &= \text{Screw lead}
+\lambda &= \text{Lead angle}
+\end{align*}
+
+
+* Belts
+** Flat Belts
+*** Tension Profile
+\setcounter{figuresec}{17}
+\setcounter{figurenum}{12}
+#+ATTR_LATEX: :width 0.6\textwidth :placement [H]
+#+CAPTION: Tension profile for a flat belt drive (pg. 887)
+[[file:res/flat_belt_tensions.svg]]
+*** Equations
+\setcounter{eqnsec}{17}
+\setcounter{equation}{0}
+\begin{align}
+\begin{split}
+\theta_d &= \pi - 2 \sin^{-1}\left(\frac{D - d}{2C}\right) \\
+\theta_D &= \pi + 2 \sin^{-1}\left(\frac{D - d}{2C}\right)
+\end{split}
+L &= \left[4C^2 - (D - d)^2\right]^{1/2} + \frac{1}{2}(D\theta_D + d\theta_d)
+\end{align}
+\myequations{Common open belt geometry relations}{678}
+
+\begin{align}
+\theta &= \pi + 2 \sin^{-1}\left(\frac{D + d}{2C}\right) \\
+L &= \left[4C^2 - (D + d)^2\right]^{1/2} + \frac{1}{2}(D + d)\theta
+\end{align}
+\myequations{Common crossed belt geometry relations}{678}
+
+Where:
+\begin{align*}
+\theta &= \text{Angle of contact} \\
+d &= \text{Diameter of small pulley} \\
+D &= \text{Diameter of large pulley} \\
+C &= \text{Center distance} \\
+L &= \text{Belt length}
+\end{align*}
+
+** V-Belts
+*** Tension Profile
+\setcounter{figuresec}{17}
+\setcounter{figurenum}{14}
+#+ATTR_LATEX: :width 0.6\textwidth :placement [H]
+#+CAPTION: Tension profile for a V-belt drive (pg. 895)
+[[file:res/v_belt_tensions.svg]]
+** Equations
+\begin{equation*}
+H_d = \frac{H_\text{nom} K_s n_d}{N_b}
+\end{equation*}
+\myequations{Design power of a belt system}{880}
+
+Where:
+\begin{align*}
+H_d &= \text{Design power} \\
+H_\text{nom} &= \text{Nominal power transfer} \\
+K_s &= \text{Service factor (For V-belts, see Table 17-15, pg. 894)} \\
+n_d &= \text{Design factor} \\
+N_b &= \text{Number of belts} \\
+\end{align*}
+* Chains
+** Design Considerations
+- 17 teeth on the driving sprocket is a good start
+- Odd number of teeth on driving sprocket, even number of pitches on chain
+- Lubrication can increase life by up to 300 times
+* Wire Rope
+** Design Considerations
+- Use a safety factor of 5 for general applications, 8 or 9 for safety critical applications
+* Misc
+** Galling
+Some metals (titanium, aluminium) can weld together when pressed together.
+These bonds will undergo shear and fail causing metal erosion.
+
+
+
