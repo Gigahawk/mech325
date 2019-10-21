@@ -1,0 +1,648 @@
+#+TITLE: MECH 325 Homework Assignment #2
+#+AUTHOR: Jasper Chan - 37467164
+#+LATEX_HEADER: \sisetup{inter-unit-product=\cdot}
+#+LATEX_HEADER: \sisetup{per-mode=symbol}
+#+LATEX_HEADER: \DeclareSIUnit\rev{rev}
+#+LATEX_HEADER: \DeclareSIUnit\inch{in}
+#+LATEX_HEADER: \DeclareSIUnit\foot{ft}
+#+LATEX_HEADER: \DeclareSIUnit\teeth{teeth}
+#+LATEX_HEADER: \DeclareSIUnit\horsepower{hp}
+#+LATEX_HEADER: \DeclareSIUnit\lbf{lbf}
+#+OPTIONS: toc:nil
+
+#+BEGIN_SRC ipython :session :results none :exports none
+import numpy as np
+from sympy import *
+
+#+END_SRC
+
+* Problem 1
+A flat-belt drive is to consist of two 4-ft-diameter cast iron pulleys spaced \SI{16}{\foot} apart.
+Select a belt type to transmit \SI{60}{\horsepower} at a pulley speed of of \SI{380}{\rev\per\minute}.
+Use a service factor of 1.1 and a design factor of 1.0.
+
+We are given the following:
+- $H_\text{nom} = \SI{60}{\horsepower}$
+- $n = \SI{380}{\rev\per\minute}$
+- $d = D = \SI{4}{\foot} = \SI{48}{\inch}$
+- $C = \SI{16}{\foot}$
+- $K_s = 1.1$
+- $n_d = 1$
+
+Let's make some assumptions/decisions:
+- Initial tension: catenary
+- Material: Polyamide A-3
+
+From this we can determine:
+- Thickness[fn:material_table]: $t = \SI{0.13}{\inch}$
+- Specific weight[fn:material_table]: $\gamma = \SI{0.042}{\lbf\per\inch\cubed}$
+- Friction coefficient: $f = 0.8$
+- Allowable force at \SI{600}{\rev\per\minute} per unit width: $F_a = \SI{100}{\lbf\per\inch}$
+- Velocity Correction Factor[fn:velocity_factor]: $C_v = 1$ 
+- Pulley Correction Factor[fn:pulley_factor]: $C_p = 1$ 
+
+[fn:material_table] Taken from Table 17-2 in Shigley's 10th Ed.
+[fn:pulley_factor] Taken from Table 17-4 in Shigley's 10th Ed.
+[fn:velocity_factor] Taken from page 879 in Shigley's 10th Ed.
+
+
+
+The only remaining parameter is belt width $b$
+We can use these parameters to find the max allowable tension using Eq. 17-12:
+\begin{equation}
+(F_1)_a = b F_a C_p C_v \tag{17-12}
+\end{equation}
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+b = symbols('b')
+F_a = 100 # lbf/in
+C_p = 1
+C_v = 1
+F_1_a = b*F_a*C_p*C_v
+f"F_1_a = {F_1_a} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[2]:
+: 'F_1_a = 100*b lbf'
+:END:
+
+
+We can also find our design horsepower and torque after being given the design constraints.
+\begin{equation*}
+H_d = H_\text{nom} K_s n_d
+\end{equation*}
+\begin{equation*}
+T = \frac{63025 H_d}{n}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+H_nom = 60 # hp
+K_s = 1.1
+n_d = 1
+H_d = H_nom * K_s * n_d
+
+f"H_d = {H_d} hp"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[49]:
+: 'H_d = 66.0 hp'
+:END:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+n = 380
+T = 63025*H_d/n
+f"T = {T:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[4]:
+: 'T = 10946.45 lbf*in'
+:END:
+
+The wrap angle of both should be $pi$, however we can still calculate it.
+\begin{equation}
+\phi = \theta_d = \theta_D =
+    \pi - 2\sin^{-1}{\left(\frac{D - d}{2C}\right)}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+D = d = 48 # in
+C = 16 * 12 # in
+phi = np.pi - 2*np.arcsin((D - d)/(2*C))
+phi
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[5]:
+: 3.141592653589793
+:END:
+
+We can use this to get $\exp{(f\phi)}$:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+f = 0.8
+exp_fphi = np.exp(f*phi)
+exp_fphi
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[6]:
+: 12.345283939187368
+:END:
+
+We should also start solving for other parts of the belting equation (Eq. (17-1)).
+$$w = 12\gamma b t$$
+$$V = \pi d n/12$$
+$$F_c = \frac{w}{g} \left(\frac{V}{60}\right)^2$$
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+gamma = 0.042 # lbf/in^3
+t = 0.13 # in
+w = 12*gamma*t*b
+V = np.pi*d*n/12
+f"w = {w} lbf/ft, V = {V:.2f} ft/min"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[7]:
+: 'w = 0.06552*b lbf/ft, V = 4775.22 ft/min'
+:END:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+g = 32.17 # ft/s^2
+F_c = (w/g)*(V/60)**2
+f"F_c = {F_c} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[8]:
+: 'F_c = 12.9005209496624*b lbf'
+:END:
+
+At $H_d$, we can use
+$$(F_1)_a - F_2 = 2T/d$$
+to find $F_2$
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+F_2 = symbols('F_2')
+eq_h = Eq(F_1_a - F_2, 2*T/d)
+F_2 = solve(eq_h, F_2)[0]
+
+f"F_2 = {F_2} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[9]:
+: 'F_2 = 100.0*b - 456.101973684211 lbf'
+:END:
+
+We can use the following equation to find the initial tension $F_i$
+$$F_i = \frac{(F_1)_a + F_2}{2} - F_c$$
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+F_i = (F_1_a + F_2)/2 - F_c
+
+f"F_i = {F_i} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[10]:
+: 'F_i = 87.0994790503376*b - 228.050986842105 lbf'
+:END:
+
+Maximize friction development using Eq. (17-7)
+\begin{equation*}
+f\phi =
+\log{\left(
+    \frac{
+        (F_1)_a - F_c
+    }{
+        F_2 - F_c
+    }
+\right)}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+a = Eq(exp_fphi, exp(ln((F_1_a - F_c)/(F_2 - F_c))))
+a
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[11]:
+: Eq(12.3452839391874, 87.0994790503376*b/(87.0994790503376*b - 456.101973684211))
+:END:
+We can now solve for width $b$
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+b_ans = solve(a, b)[0]
+f"b = {b_ans:.2f} in"
+
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[12]:
+: 'b = 5.70 in'
+:END:
+We know that a belt with a diameter greater than this will develop less friction than our given $f$, so let's pick the next integer belt size up.
+#+BEGIN_SRC ipython :session :results raw drawer
+b_ans = np.ceil(b_ans)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[13]:
+:END:
+With our belt width selected, we can find numerical values for all of our previous forces/tensions.
+
+#+BEGIN_SRC ipython :session :results raw drawer
+F_c = F_c.subs(b, b_ans)
+F_1_a = F_1_a.subs(b, b_ans)
+F_2 = F_2.subs(b, b_ans)
+F_i = F_i.subs(b, b_ans)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[14]:
+:END:
+
+With our forces calculated, we can find transmitted power $H_t$
+\begin{equation*}
+H_t = \frac{[(F_1)_a - F_2]V}{33000}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+H_t = ((F_1_a - F_2)*V)/33000
+
+f"H_t = {H_t:.2f} hp"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[15]:
+: 'H_t = 66.00 hp'
+:END:
+
+We can also check that our friction development $f'$ is within our limits:
+\begin{equation*}
+f' =
+\frac{1}{\phi}
+\log{\left(
+    \frac{(F_1)_a - F_c}{F_2 - F_c}
+\right)}
+\end{equation*}
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+fp = (1/phi)*ln((F_1_a - F_c)/(F_2 - F_c))
+fp < f
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[16]:
+: True
+:END:
+
+Finally, let's calculate catenary dip using Eq. (17-13)
+\begin{equation}
+dip = \frac{12(C/12)^2w}{8F_i} = \frac{C^2 w}{96F_i} \tag{17-13}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+w = w.subs(b, b_ans)
+dip = (C**2 * w)/(96*F_i)
+f"dip = {dip:.3f} in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[17]:
+: 'dip = 0.513 in'
+:END:
+
+* Problem 2
+A single Gates Rubber V belt is to be selected to deliver engine power to the wheel-drive transmission of a riding tractor.
+A 5-hp single-cylinder engine is used.
+The mechanical efficiency of the gearbox is \SI{60}{\percent} so that only \SI{3}{\horsepower} is transmitted to the belt.
+The driving sheave has a diameter of \SI{6.2}{\inch},
+the driven, \SI{12.0}{\inch}.
+The belt selected should be as close to a 92-in pitch length as possible.
+The engine speed is governor-controlled to a maximum of \SI{3100}{\rev\per\minute}.
+Select a satisfactory belt and assess the factor of safety and the belt life in passes.
+
+We're asked to choose a belt with about \SI{92}{\inch} pitch length, so let's pick B90.
+
+We can find our pitch length by going to Table 17-11 to find the length to be added.
+#+BEGIN_SRC ipython :session :results raw drawer
+inner_circ = 90
+L_p = inner_circ + 1.8 # Table 17-11 for B size
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[18]:
+:END:
+
+We can also find our center distance $C$ using the given sheave diameters.
+\begin{equation}
+C = 0.25\left\{
+    \left[
+        L_p - \frac{\pi}{2}(D + d)
+    \right]
+    +
+    \sqrt{
+        \left[
+            L_p - \frac{\pi}{2}(D + d)
+        \right]^2
+        -
+        2(D - d)^2
+    }
+\right\} \tag{17-16b}
+\end{equation}
+
+
+#+BEGIN_SRC ipython :session :results raw drawer
+D = 12 # in
+d = 6.2 # in
+
+C = 0.25*(
+    (L_p - (np.pi/2)*(D + d)) +
+    np.sqrt(
+        (L_p - (np.pi/2)*(D + d))**2 -
+        2*(D - d)**2
+    )
+)
+f"C = {C:.2f} in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[19]:
+: 'C = 31.47 in'
+:END:
+
+With this, we can find our wrap angle $\theta_d$
+\begin{equation*}
+\theta_b = \pi - 2\sin^{-1}\left(\frac{D - d}{2C}\right)
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+theta_d = np.pi - 2*sin((D - d)/(2*C))
+f"theta_d = {theta_d:.4f} rad"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[24]:
+: 'theta_d = 2.9576 rad'
+:END:
+
+We can use this to get $\exp{(f\theta_d)}$:
+#+BEGIN_SRC ipython :session :results raw drawer
+f = 0.5123 # From page 892 of Shigley's
+exp_ftheta = exp(f*theta_d)
+f"{exp_ftheta:.4f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[23]:
+: '4.5501'
+:END:
+
+We can also find belt velocity $V$
+\begin{equation*}
+V = \frac{\pi d n}{12}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+n = 3100 # rev/min
+V = np.pi*d*n/12
+f"V = {V:.2f} ft/min"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[22]:
+: 'V = 5031.78 ft/min'
+:END:
+
+
+Let's convert our $\theta_d$ to radians so that we can plug it into the formula for $K_1$ from Table 17-13:
+\begin{equation*}
+K_1 = 0.143543 + 0.007468\theta - 0.000015052\theta^2
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+theta_d_deg = theta_d * 180 / np.pi
+K_1 = 0.143543 + 0.007468*theta_d_deg - 0.000015052*theta_d_deg**2
+K_1
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[25]:
+: 0.976816932526150
+:END:
+
+The design power $H_d$ is given by
+\begin{equation*}
+H_d = H_\text{nom} K_s n_d
+\end{equation*}
+
+We have a single cylinder engine, so the torque will be non-uniform, but the load (tractor) is probably fairly uniform, so we will take $K_s = 1.3$
+
+Since I have been given a design factor, I will assume $n_d = 1$.
+
+#+BEGIN_SRC ipython :session :results raw drawer
+H_nom = 0.6*5 # hp
+K_s = 1.3
+H_d = H_nom*K_s*n_d
+f"H_d = {H_d:.2f} hp"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[52]:
+: 'H_d = 3.90 hp'
+:END:
+
+To find allowable power $H_a$, we need $K_2$ and $H_\text{tab}$
+Using Table 17-14, we get that $K_2 = 1$.
+Using Table 17-12, $H_\text{tab} \approx 4$.
+\begin{equation*}
+H_a = K_1 K_2 H_\text{tab}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+K_2 = 1
+H_tab = 4
+H_a = K_1 * K_2 * H_tab
+f"H_a = {H_a:.2f} hp"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[51]:
+: 'H_a = 3.91 hp'
+:END:
+
+Let's use this information to find the number of belts we need for our system $N_b$
+#+BEGIN_SRC ipython :session :results raw drawer
+N_b = np.ceil(H_d/H_a)
+f"N_b = {N_b}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[55]:
+: 'N_b = 1'
+:END:
+
+Now we can check our safety factor $n_{fs}$
+$$n_{fs} = \frac{H_a N_b}{H_d}$$
+#+BEGIN_SRC ipython :session :results raw drawer
+n_fs = H_a*N_b/H_d
+f"n_fs = {n_fs:.4f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[57]:
+: 'n_fs = 1.0019'
+:END:
+
+The allowable force $\Delta F_a$ is given by
+\begin{equation*}
+\Delta F_a = \frac{63025 H_a}{n(d/2)}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+dF_a = 63025*H_a/(n*(d/2))
+
+f"dF_a = {dF_a:.2f} hp"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[33]:
+: 'dF_a = 25.62 hp'
+:END:
+The allowable torque $T_a$ is
+\begin{equation}
+T_a = \frac{\Delta F_a d}{2}
+\end{equation}
+
+#+BEGIN_SRC ipython :session :results raw drawer
+T_a = dF_a*d/2
+f"T_a = {T_a:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[35]:
+: 'T_a = 79.44 lbf*in'
+:END:
+
+Using Table 17-16, we get $K_c = 0.965$, which we can use to find centripetal force $F_c$
+\begin{equation*}
+F_c = K_c\left(\frac{V}{1000}\right)^2
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+K_c = 0.965
+F_c = K_c*(V/1000)**2
+f"F_c = {F_c:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[37]:
+: 'F_c = 24.43 lbf'
+:END:
+
+We can also find the force for incident slip from equation 17-9
+\begin{equation}
+F_i =
+\left(\frac{T}{d}\right)
+\left[
+    \frac{\exp{(f\theta)} + 1}{\exp{(f\theta)} - 1}
+\right] \tag{17-9}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer
+F_i = (T_a/d)*((exp_ftheta + 1)/(exp_ftheta - 1))
+f"F_i = {F_i:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[43]:
+: 'F_i = 20.03 lbf'
+:END:
+
+With this, we can use Eq. (17-10)
+\begin{equation}
+F_1 =
+F_c +
+F_i
+\left[
+\frac{2\exp{(f\theta)}}{\exp{(f\theta)} + 1}
+\right] \tag{17-10}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer
+F_1 = F_c + F_i*((2*exp_ftheta)/(exp_ftheta + 1))
+f"F_1 = {F_1:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[46]:
+: 'F_1 = 57.28 lbf'
+:END:
+
+From this, we can get F_2 through:
+$$F_2 = F_1 - \Delta F_a$$
+#+BEGIN_SRC ipython :session :results raw drawer
+F_2 = F_1 - dF_a
+f"F_2 = {F_2:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[48]:
+: 'F_2 = 31.65 lbf'
+:END:
+
+We can use Table 17-16 to find $K_b$ for equivalent tensions $T_1$ and $T_2$.
+\begin{align*}
+T_1 &= F_1 + (F_b)_1 = F_1 + \frac{K_b}{d} \\
+T_2 &= F_1 + (F_b)_2 = F_1 + \frac{K_b}{D}
+\end{align*}
+From Table
+#+BEGIN_SRC ipython :session :results rawdrawer
+K_b = 576
+T_1 = F_1 + (K_b/d)
+T_2 = F_1 + (K_b/D)
+f"T_1 = {T_1:.2f} lbf, T_2 = {T_2:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+: # Out[62]:
+: : 'T_1 = 150.18 lbf, T_2 = 105.28 lbf'
+
+From Table 17-17, we get values $K = 1193$, $b = 10.926$, and can find max number of belt passes $N_p$ from Eq. (17-27)
+\begin{equation}
+N_p =
+\left[
+    \left(
+        \frac{K}{T_1}
+    \right)^2
+    +
+    \left(
+        \frac{K}{T_2}
+    \right)^2
+\right]^{-1}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer
+K = 1193
+b = 10.926
+N_p = ((K/T_1)**-b + (K/T_2)**-b)**-1
+f"N_p = {N_p:.3e} passes"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[100]:
+: 'N_p = 6.682e+9 passes'
+:END:
+
+Using Eq (17-28):
+\begin{equation}
+t = \frac{N_p L_p}{720 V}
+\end{equation}
+#+BEGIN_SRC ipython :session :results raw drawer
+t = (N_p*L_p)/(720*V)
+f"t = {t:.0f} h"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[111]:
+: 't = 169305 h'
+:END:
+
