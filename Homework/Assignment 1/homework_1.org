@@ -1,0 +1,495 @@
+#+TITLE: MECH 325 Homework Assignment #1
+#+AUTHOR: Jasper Chan - 37467164
+#+LATEX_HEADER: \sisetup{inter-unit-product=\cdot}
+#+LATEX_HEADER: \sisetup{per-mode=symbol}
+#+LATEX_HEADER: \DeclareSIUnit\rev{rev}
+#+LATEX_HEADER: \DeclareSIUnit\inch{in}
+#+LATEX_HEADER: \DeclareSIUnit\foot{ft}
+#+LATEX_HEADER: \DeclareSIUnit\teeth{teeth}
+#+LATEX_HEADER: \DeclareSIUnit\lbf{lbf}
+#+OPTIONS: toc:nil
+
+#+BEGIN_SRC ipython :session :results none :exports none
+import numpy as np
+from sympy import *
+
+#+END_SRC
+
+* Problem 1
+** label:13_24
+A gearbox is to be designed with a compound reverted gear train that transmits 25 horsepower with an input speed of \SI{2500}{\rev\per\minute}.
+The output should deliver the power at a rotational speed in the range of 280 to \SI{300}{\rev\per\min}.
+Spur gears with \SI{20}{\degree} pressure angle are to be used.
+Determine the suitable numbers of teeth for each gear, to minimize the gearbox size, while providing an output speed within the specified range.
+Be sure to an interference problem in the teeth.
+
+A compound reverted gear train is a compound gear train where the input and output shafts are colinear.
+This can be done with at minimum four gears.
+
+#+BEGIN_SRC ipython :session :results raw drawer
+H = 25 # hp
+omega_i = 2500
+omega_o = np.mean((280, 300)) # rpm
+
+# Total gear ratio between input and output
+r_total = omega_o / omega_i
+
+# Assume gear ratio between first two gears and last two are the same
+r = np.sqrt(r_total)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[56]:
+:END:
+
+We can use Equation 13-11 from the textbook to find the smallest number of teeth on the pinion without interference:
+\begin{equation}
+N_p =
+\frac{2k}{(1 + 2m)\sin^2{\phi}}
+\left(
+    m + \sqrt{m^2 + (1 + 2m)\sin^2{\phi}}
+\right)
+\tag{13-11}
+\end{equation}
+where $k$ is the teeth depth,
+$\phi$ is the pressure angle,
+and $m = 1/r$.
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+phi = 20/180 * np.pi # 20deg pressure angle to radians
+k = 1 # Full depth teeth
+m = 1/r 
+
+N_P = 2*k/((1 + 2*m)*np.sin(phi)**2) \
+  ,* (m + np.sqrt(m**2 + (1 + 2*m)*np.sin(phi)**2))
+N_P = int(np.round(N_P))
+N_P # Number of teeth on input gears
+
+N_2 = N_4 = N_P
+N_3 = N_5 = int(np.round(N_P * m))
+
+N_2, N_3
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[57]:
+: (15, 44)
+:END:
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+
+omega_o = (N_2/N_3)*(N_4/N_5)*omega_i
+while not 280 <= omega_o <= 300:
+    if omega_o < 280:
+        N_3 -= 1
+        N_5 -= 1
+    else:
+        N_3 += 1
+        N_5 += 1
+    r = (N_2/N_3)*(N_4/N_5)
+    omega_o = r * omega_i
+r = (N_2/N_3)*(N_4/N_5)
+
+f"N_2 and N_4 need {N_2} teeth, N_3 and N_5 need {N_3} teeth"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[61]:
+: 'N_2 and N_4 need 15 teeth, N_3 and N_5 need 44 teeth'
+:END:
+** 
+Continue Problem ref:13_24 by finding the following information, assuming a diametral pitch of \SI{6}{\teeth\per\in}.
+*** Determine pitch diameters for each of the gears
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+P = 6 # teeth/diametral inch
+d_2 = d_4 = N_2/P
+d_3 = d_5 = N_3/P
+
+f"d_2 = d_3 = {d_2:.2f} in, d_3 = d_5 = {d_3:.2f} in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[62]:
+: 'd_2 = d_3 = 2.50 in, d_3 = d_5 = 7.33 in'
+:END:
+*** Determine pitch line velocities (in \si{\foot\per\minute}) for each set of gears.
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+V_i = V_2 = V_3 = (np.pi*d_2*omega_i)/12
+V_o = V_4 = V_5 = (np.pi*d_5*omega_o)/12
+
+f"V_i = {V_i:.2f} ft/min, V_o = {V_o:.2f} ft/min"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[66]:
+: 'V_i = 1636.25 ft/min, V_o = 557.81 ft/min'
+:END:
+*** Determine the magnitudes of the tangential, radial and total forces transmitted between each set of gears.
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+W_ti = 33000 * H/V_i
+W_ri = W_ti * np.tan(phi)
+W_i = np.sqrt(W_ti**2 + W_ri**2)
+
+f"W_ti = {W_ti:.2f} lbf, W_ri = {W_ri:.2f} lbf, W_i = {W_i:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[67]:
+: 'W_ti = 504.20 lbf, W_ri = 183.51 lbf, W_i = 536.56 lbf'
+:END:
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+W_to = 33000 * H/V_o
+W_ro = W_to * np.tan(phi)
+W_o = np.sqrt(W_to**2 + W_ro**2)
+
+f"W_to = {W_to:.2f} lbf, W_ro = {W_ro:.2f} lbf, W_o = {W_o:.2f} lbf"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[68]:
+: 'W_to = 1479.00 lbf, W_ro = 538.31 lbf, W_o = 1573.91 lbf'
+:END:
+*** Determine the input torque.
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+T_i = W_ti * (d_2/2)
+f"T_i = {T_i:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[69]:
+: 'T_i = 630.25 lbf*in'
+:END:
+*** Determine the output torque, neglecting frictional losses
+#+BEGIN_SRC ipython :session :results raw drawer exports both
+T_o = W_to * (d_5/2)
+f"T_o = {T_o:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[72]:
+: 'T_o = 5422.98 lbf*in'
+:END:
+* Problem 2
+** 
+The figure shows a 10 diametral pitch 18-tooth \SI{20}{\degree} straight bevel pinion driving a 30-tooth gear.
+The transmitted load is \SI{25}{\lbf}.
+Find the bearing recations at $C$ and $D$ on the output shaft if $D$ is to take both radial and thrust loads.
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:problem_13_44.svg]]
+
+Taking moments about $D$:
+#+BEGIN_SRC ipython :session :results raw drawer
+W_t = 25 # lbf
+phi = 20/180*np.pi # pressure angle
+
+d_2 = 18/10 # inch
+d_3 = 30/10 # inch
+# pitch angles
+gamma = np.arctan(d_2/d_3)
+Gamma = np.pi - gamma
+
+# Distance from D to pitch circle center
+D_pc = 9/16 + (1/2)*np.cos(Gamma)
+
+# Gear meshing loads
+W_r = W_t * np.tan(phi)*np.cos(Gamma)
+W_a = W_t * np.tan(phi)*np.sin(Gamma)
+W = Matrix([-W_r, -W_a, W_t])
+
+# Vector from D to edge of pitch circle
+R_D_pce = Matrix([d_3/2, D_pc, 0])
+
+# Vector from D to C
+R_DC = Matrix([0, -(5/8), 0])
+
+# Meshing moment
+M_m = R_D_pce.cross(W)
+
+# Reaction torque must be applied along y axis
+T = Matrix([0, -M_m[1], 0])
+
+F_C = Matrix([0, 0, 0])
+F_C[0] = -(M_m[0])/R_DC[1]
+F_C[1] = 0 # Assume thrust force is carried at D
+F_C[2] = -(M_m[2])/R_DC[1]
+
+(f"F_C = {['{0:.2f}'.format(float(v)) for v in list(F_C)]} lbf, "
+ f"T = {['{0:.2f}'.format(float(v)) for v in list(T)]} lbf")
+
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+
+: "F_C = ['5.35', '0.00', '-12.91'] lbf, T = ['0.00', '37.50', '0.00'] lbf"
+:END:
+* Problem 3
+Gear 2, in the figure,
+has 16 teeth,
+a \SI{20}{\degree} transverse pressure angle, 
+a \SI{15}{\degree} helix angle,
+and a module of \SI{4}{\milli\meter}.
+Gear 2 drives the idler on shaft $b$, which has 36 teeth.
+The driven gear on shaft$c$ has 28 teeth.
+If the driver rotates at \SI{1600}{\rev\per\minute} and transmits \SI{6}{\kilo\watt}, find the radial and thurst load on each shaft.
+#+ATTR_LATEX: :width 0.4\textwidth
+[[file:problem_13_49.svg]]
+
+#+BEGIN_SRC ipython :session :results output :exports both
+H = 6*10**3 # watt
+omega_i = 1600 * (2*np.pi) / 60# rad/s
+m = 4*10**-3 # m
+phi = 20/180*np.pi
+psi = 15/180*np.pi
+
+N_2 = 16 # teeth
+N_3 = 36
+N_4 = 28
+
+d_2 = m*N_2
+d_3 = m*N_3
+d_4 = m*N_4
+
+T = H/omega_i
+
+W_t = T/(d_2/2)
+W_r = W_t*np.tan(phi)
+W_a = W_t*np.tan(psi)
+
+F_a = Matrix([-W_t, -W_r, -W_a])
+F_b = Matrix([W_t - W_r, W_t - W_r, 0])
+F_c = Matrix([W_r, W_t, W_a])
+
+print(f"F_a = {['{0:.2f}'.format(float(v)) for v in list(F_a)]} N")
+print(f"F_b = {['{0:.2f}'.format(float(v)) for v in list(F_b)]} N")
+print(f"F_c = {['{0:.2f}'.format(float(v)) for v in list(F_c)]} N")
+#+END_SRC
+
+#+RESULTS:
+: F_a = ['-1119.06', '-407.30', '-299.85'] N
+: F_b = ['711.75', '711.75', '0.00'] N
+: F_c = ['407.30', '1119.06', '299.85'] N
+
+* Problem 4
+A spur gearset has 17 teeth on the pinion and 51 on the gear.
+The pressure angle is \SI{20}{\degree} and the overload factor $K_o = 1$.
+The diametral pitch is \SI{6}{\teeth\per\inch} and the face width is \SI{2}{\inch}.
+The pinion speed is \SI{1120}{\rev\per\minute} and
+its cycle life is to be \SI[parse-numbers=false]{10^8}{\rev} at
+a reliability of $R = 0.99$.
+The quality number is 5.
+The material is a through-hardened steel, grade 1, with Brinell hardnesses of 232 core and case of both gears.
+For a design factor of 2, rate the gearset for these conditions using the AGMA method
+
+#+BEGIN_SRC ipython :session :results raw drawer
+R = 0.99
+cycles = 10**8
+phi = 20/180*np.pi
+P = 6
+H_B = 232
+omega = 1120 # rpm
+Q_v = 5
+S_F = 2
+S_H = np.sqrt(S_F)
+K_o = 1
+
+N_p = 17 # teeth
+N_g = 51
+d_p = N_p/P # inch
+d_g = N_g/P
+
+# Table 14-2
+Y_p = 0.303 
+Y_g = 0.410
+
+# Figure 16-6
+J_p = 0.29
+J_g = 0.4
+
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[214]:
+:END:
+
+** Pinion Bending
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+
+# Figure 14-2
+S_t = 77.3*H_B + 12800
+
+# Figure 14-14
+Y_N = 1.6831*(cycles)**(-0.0323)
+V = np.pi*d_p*omega/12 # ft/min
+K_T = K_R = 1
+
+sigma_all = (S_t*Y_N)/(2*K_T*K_R)
+B = 0.25*(12 - Q_v)**(2/3)
+A = 50 + 56*(1 - B)
+
+K_v = ((A + np.sqrt(V))/A)**B
+K_s = 1.192*((2*np.sqrt(Y_p))/6)**0.0535
+K_s = K_s if K_s < 1 else 1
+
+C_mc = 1 # Eq 14-31
+C_pf = S_F/(10*d_p) - 0.0375 + 0.0125*S_F # Eq 14-32
+C_pm = 1 # Eq 14-33
+C_ma = 0.127 + 0.0158*(S_F) - 0.093*10**-4*S_F**2 # Eq 14-34
+C_e = 1 # Eq 14-35
+K_m = 1 + C_mc*(C_pf*C_pm + C_ma*C_e)
+
+K_B = 1
+
+W_tb = (S_F*J_p*sigma_all)/(K_o*K_v*K_s*P*K_m*K_B)
+H_b = W_tb*V/(33000)
+
+W_tb
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[233]:
+: 769.8665386093276
+:END:
+** Pinion Wear
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+
+# Fig 14-15
+Z_N = 2.466*cycles**-0.056
+m_g = N_g/N_p
+
+# Equation 14-23
+C_H = 1
+I = np.cos(phi)*np.sin(phi)/2 * m_g/(m_g + 1)
+
+# Fig 14-5
+S_C = 322*H_B + 29100
+sigma_call = S_C*Z_N*C_H/(S_H*K_T*K_R)
+
+C_p = 2300
+C_f = 1
+W_tw = (sigma_call/C_p)**2 * (S_F*d_p*I)/(K_o*K_v*K_s*K_m*C_f)
+
+H_w = W_tw*V/33000
+W_tw
+
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[232]:
+: 300.033972467444
+:END:
+#+BEGIN_SRC ipython :session :results output :exports both
+if W_tw < W_tb:
+    print(f"H_rated = {H_w:.2f} hp")
+else:
+    print(f"H_rated = {H_w:.2f} hp")
+#+END_SRC
+
+#+RESULTS:
+: H_rated = 7.55 hp
+
+* Problem 5
+#+ATTR_LATEX: :width 0.75\textwidth
+** label:8_5
+The machine shown in the figure can be used for a tension test but not for a compression test.
+Why?
+Can both screws have the same hand?
+[[file:problem_8_5.svg]]
+
+Collar/thrust bearings at the bottom of the lead screws must be in compression, a compression test would cause the thrust bearings to see a tensile force.
+
+Both lead screws must be the same direction to be rotated as shown in the figure.
+
+** 
+The press shown in Problem ref:8_5 has a rated load of \SI{5000}{\lbf}.
+The twin screws have Acme threads,
+a diameter of \SI{2}{\inch},
+and a pitch of \SI[parse-numbers=false]{0.25}{\inch}.
+Coefficiens of friction are $0.05$ for the threads and $0.08$ for the collar bearings.
+Collar diameters are \SI{3.5}{\inch}.
+The gears have an efficiency of 95 percent and a speed ratio of 60:1.
+A slip clutch, on the motor shaft, prevents overloading.
+The full-load motor speed is \SI{1720}{\rev\per\min}.
+*** When the motor is turned on, how fast will the press head move?
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+omega = 1720 # rpm
+r = 60
+F = 2500 # N per lead screw
+d_ls = 2 # inch (lead screw diameter)
+d_c = 3.5 #inch (collar diameter)
+lead = 0.25
+a = 1/np.cos((29/2)/180*np.pi)
+mu_t = 0.05
+mu_c = 0.08
+e_s = 0.95 # spur gear efficiency
+
+d_m = d_ls - lead/d_ls
+
+n = omega/r
+
+V = n*lead
+f"Lead screw moves at {V:.2f} in/min"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[272]:
+: 'Lead screw moves at 7.17 in/min'
+:END:
+*** What should be the horsepower rating of the motor?
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+T_R = (F*d_m)/2 * (lead + np.pi*mu_t*d_m*a)/(np.pi*d_m - mu_t*lead*a)
+f"{T_R:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[266]:
+: '221.00 lbf'
+:END:
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+T_c = F*mu_c*d_c/2
+f"{T_c:.2f} lbf*in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[269]:
+: '350.00 lbf'
+:END:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+T_total = T_c + T_R
+f"{T_total:.2f} lbf*in (per screw)"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[271]:
+: '571.00 lbf*in (per screw)'
+:END:
+#+BEGIN_SRC ipython :session :results raw drawer:exports both
+T_motor = T_total*2/(r*e_s)
+H = T_motor*omega/63025
+f"H = {H:.2f} hp"
+
+#+END_SRC
+
+#+RESULTS:
+# Out[273]:
+: 'H = 0.55 hp'
+
