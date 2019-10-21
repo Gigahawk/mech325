@@ -1,0 +1,56 @@
+Thread Size	Height	Diameter	Starts	Speed Ratio	Travel Distance per Turn	Thread Fit	Hardness	Specifications Met	Part	Cost	Material	Direction	Type
+"1/2""-10"	"1"""	"1 15/32"""	1	1:1	"0.1"""	Class 2G	Rockwell B96	__	95080A103	30.88	Cast Iron	right	round
+"5/8""-8"	"1 1/4"""	"1 55/64"""	1	1:1	"0.125"""	Class 2G	Rockwell B96	__	95080A108	44.03	Cast Iron	right	round
+"3/4""-5"	"1 1/2"""	"2 15/64"""	1	1:1	"0.2"""	Class 2G	Rockwell B96	__	95080A112	48.64	Cast Iron	right	round
+"3/4""-6"	"1 1/2"""	"2 15/64"""	1	1:1	"0.167"""	Class 2G	Rockwell B96	__	95080A113	44.3	Cast Iron	right	round
+"1""-5"	"2"""	"2 63/64"""	1	1:1	"0.2"""	Class 2G	Rockwell B96	__	95080A122	59.94	Cast Iron	right	round
+"1""-6"	"2"""	"2 63/64"""	1	1:1	"0.167"""	Class 2G	Rockwell B96	__	95080A123	71.15	Cast Iron	right	round
+"1""-10"	"2"""	"2 63/64"""	1	1:1	"0.1"""	Class 2G	Rockwell B96	__	95080A125	60.3	Cast Iron	right	round
+"1 1/4""-5"	"2 1/2"""	"3 47/64"""	1	1:1	"0.2"""	Class 2G	Rockwell B96	__	95080A128	117.91	Cast Iron	right	round
+"1 1/2""-4"	"3"""	"4 15/32"""	1	1:1	"0.25"""	Class 2G	Rockwell B96	__	95080A132	123.38	Cast Iron	right	round
+"3/8""-12"	"3/8"""	"3/4"""	1	1:1	"0.083"""	Class 2G	Rockwell B55	ASTM B16	95100A101	4.99	360 Brass	right	round
+"1/2""-10"	"1/2"""	"7/8"""	1	1:1	"0.1"""	Class 2G	Rockwell B55	ASTM B16	95100A103	5.94	360 Brass	right	round
+"5/8""-8"	"5/8"""	"1"""	1	1:1	"0.125"""	Class 2G	Rockwell B55	ASTM B16	95100A105	7.64	360 Brass	right	round
+"3/4""-5"	"3/4"""	"1 1/4"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A107	9.69	360 Brass	right	round
+"3/4""-6"	"3/4"""	"1 1/4"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A109	9.69	360 Brass	right	round
+"7/8""-6"	"7/8"""	"1 1/2"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A117	13.58	360 Brass	right	round
+"1""-5"	"1"""	"1 5/8"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A119	16.01	360 Brass	right	round
+"1""-6"	"1"""	"1 5/8"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A121	16.01	360 Brass	right	round
+"1""-10"	"1"""	"1 5/8"""	1	1:1	"0.1"""	Class 2G	Rockwell B55	ASTM B16	95100A123	16.01	360 Brass	right	round
+"1 1/4""-5"	"1 1/4"""	"2"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A127	30.21	360 Brass	right	round
+"1 1/2""-4"	"1 1/2"""	"2 1/2"""	1	1:1	"0.25"""	Class 2G	Rockwell B55	ASTM B16	95100A129	44.11	360 Brass	right	round
+"1/4""-16"	"17/32"""	"23/32"""	1	1:1	"0.063"""	Class 2G	Not Rated	ASTM B505	95090A501	24.05	932 Bearing Bronze	right	round
+"3/8""-12"	"3/4"""	"7/8"""	1	1:1	"0.083"""	Class 2G	Not Rated	ASTM B505	95090A502	24.05	932 Bearing Bronze	right	round
+"1/2""-10"	"29/32"""	"29/32"""	1	1:1	"0.1"""	Class 2G	Not Rated	ASTM B505	95090A104	20.08	932 Bearing Bronze	right	round
+"5/8""-8"	"1 1/32"""	"1 9/32"""	1	1:1	"0.125"""	Class 2G	Not Rated	ASTM B505	95090A108	24.54	932 Bearing Bronze	right	round
+"3/4""-5"	"1 9/32"""	"1 13/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A112	39.3	932 Bearing Bronze	right	round
+"3/4""-6"	"1 17/64"""	"1 13/32"""	1	1:1	"0.167"""	Class 2G	Not Rated	ASTM B505	95090A117	41.67	932 Bearing Bronze	right	round
+"7/8""-6"	"1 17/32"""	"1 21/32"""	1	1:1	"0.167"""	Class 2G	Not Rated	ASTM B505	95090A503	59.45	932 Bearing Bronze	right	round
+"1""-4"	"1 17/32"""	"1 21/32"""	1	1:1	"0.25"""	Class 2G	Not Rated	ASTM B505	95090A504	48.51	932 Bearing Bronze	right	round
+"1""-5"	"1 17/32"""	"1 21/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A127	46.2	932 Bearing Bronze	right	round
+"1""-6"	"1 17/32"""	"1 21/32"""	1	1:1	"0.167"""	Class 2G	Not Rated	ASTM B505	95090A505	64.94	932 Bearing Bronze	right	round
+"1""-10"	"1 17/32"""	"1 21/32"""	1	1:1	"0.1"""	Class 2G	Not Rated	ASTM B505	95090A506	60.84	932 Bearing Bronze	right	round
+"1 1/4""-4"	"2 1/64"""	"2 5/32"""	1	1:1	"0.25"""	Class 2G	Not Rated	ASTM B505	95090A507	80	932 Bearing Bronze	right	round
+"1 1/4""-5"	"2 1/64"""	"2 5/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A129	80	932 Bearing Bronze	right	round
+"1 1/2""-4"	"3"""	"2 25/32"""	1	1:1	"0.25"""	Class 2G	Not Rated	ASTM B505	95090A133	177	932 Bearing Bronze	right	round
+"2""-4"	"4 1/64"""	"3 9/32"""	1	1:1	"0.25"""	Class 2G	Not Rated	ASTM B505	95090A136	201.9	932 Bearing Bronze	right	round
+"1/2""-10"	"1"""	"1 15/32"""	1	1:1	"0.1"""	Class 2G	Rockwell B96	__	95080A403	27.85	Cast Iron	left	round
+"5/8""-8"	"1 1/4"""	"1 55/64"""	1	1:1	"0.125"""	Class 2G	Rockwell B96	__	95080A408	50.97	Cast Iron	left	round
+"3/4""-5"	"1 1/2"""	"2 15/64"""	1	1:1	"0.2"""	Class 2G	Rockwell B96	__	95080A412	49.03	Cast Iron	left	round
+"3/4""-6"	"1 1/2"""	"2 15/64"""	1	1:1	"0.167"""	Class 2G	Rockwell B96	__	95080A413	37.88	Cast Iron	left	round
+"1""-5"	"2"""	"2 63/64"""	1	1:1	"0.2"""	Class 2G	Rockwell B96	__	95080A422	58.18	Cast Iron	left	round
+"1/2""-10"	"1/2"""	"7/8"""	1	1:1	"0.1"""	Class 2G	Rockwell B55	ASTM B16	95100A403	5.94	360 Brass	left	round
+"5/8""-8"	"5/8"""	"1"""	1	1:1	"0.125"""	Class 2G	Rockwell B55	ASTM B16	95100A405	7.64	360 Brass	left	round
+"3/4""-5"	"3/4"""	"1 1/4"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A407	9.69	360 Brass	left	round
+"3/4""-6"	"3/4"""	"1 1/4"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A409	9.69	360 Brass	left	round
+"7/8""-6"	"7/8"""	"1 1/2"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A417	13.58	360 Brass	left	round
+"1""-5"	"1"""	"1 5/8"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A419	16.01	360 Brass	left	round
+"1""-6"	"1"""	"1 5/8"""	1	1:1	"0.167"""	Class 2G	Rockwell B55	ASTM B16	95100A421	16.01	360 Brass	left	round
+"1""-10"	"1"""	"1 5/8"""	1	1:1	"0.1"""	Class 2G	Rockwell B55	ASTM B16	95100A423	16	360 Brass	left	round
+"1 1/4""-5"	"1 1/4"""	"2"""	1	1:1	"0.2"""	Class 2G	Rockwell B55	ASTM B16	95100A427	30.21	360 Brass	left	round
+"1/2""-10"	"29/32"""	"29/32"""	1	1:1	"0.1"""	Class 2G	Not Rated	ASTM B505	95090A404	21.11	932 Bearing Bronze	left	round
+"5/8""-8"	"1 1/32"""	"1 9/32"""	1	1:1	"0.125"""	Class 2G	Not Rated	ASTM B505	95090A408	26.75	932 Bearing Bronze	left	round
+"3/4""-5"	"1 9/32"""	"1 13/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A412	48.21	932 Bearing Bronze	left	round
+"3/4""-6"	"1 17/64"""	"1 13/32"""	1	1:1	"0.167"""	Class 2G	Not Rated	ASTM B505	95090A417	55.31	932 Bearing Bronze	left	round
+"1""-5"	"1 17/32"""	"1 21/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A427	53.15	932 Bearing Bronze	left	round
+"1 1/4""-5"	"2 1/64"""	"2 5/32"""	1	1:1	"0.2"""	Class 2G	Not Rated	ASTM B505	95090A429	87.89	932 Bearing Bronze	left	round
