@@ -248,12 +248,12 @@ K_R =
 #+ATTR_LATEX: :width 0.3\textwidth :placement [H]
 [[file:res/reliability_factor.svg]]
 *** Temperature Factor $K_T$ ($Y_\theta$)
-Use $K_T = 1 $ unless given.
+Use $K_T = 1$ unless given.
 *** Rim-Thickness Factor $K_B$
 \setcounter{eqnsec}{14}
 \setcounter{equation}{38}
 \begin{align}
-\m_B &= \frac{t_R}{h_t} \\
+m_B &= \frac{t_R}{h_t} \\
 K_B &=
 \begin{cases}
 1.6 \ln\left(\frac{2.242}{m_B}\right) & m_B < 1.2 \\
@@ -278,7 +278,38 @@ Interference occurs when meshing gears are not conjugate
 (i.e. teeth contacting along points that are not involute)
 See \autoref{eq:min_teeth_pinion} on page \pageref{eq:min_teeth_pinion}.
 ** Ratio
-Driving over driven
+Driving over driven. Reduction means speed reduction.
+** Planetary Gears
+\setcounter{figuresec}{13}
+\setcounter{figurenum}{30}
+#+ATTR_LATEX: :width 0.5\textwidth :placement [H]
+#+CAPTION: Planetary gear train (pg. 696)
+[[file:res/planetary_gears.svg]]
+
+*** Calculating output speed
+First, find the ratio of the gears holding the arm stationary:
+\begin{equation*}
+e = -\frac{N_2}{N_4}\frac{N_4}{N_5} = -\frac{N_2}{N_5}
+\end{equation*}
+Note, $e$ is negative because the ring gear spins in the same direction of the planet gear, and hence opposite to the sun gear.
+Substitute $e$ back into the \autoref{eq:pg_ratio} on page \pageref{eq:pg_ratio}.
+
+*** Equations
+\setcounter{eqnsec}{13}
+\setcounter{equation}{31}
+\begin{align}
+e &= \frac{n_5 - n_3}{n_2 - n_3} \notag \\
+e &= \frac{n_L - n_A}{n_F - n_A} \label{eq:pg_ratio}
+\end{align}
+\myequations{Planetary gear train ratio}{696}
+
+Where:
+\begin{align*}
+n_F &= \text{rev/min of first gear in planetary train} \\
+n_L &= \text{rev/min of last gear in planetary train} \\
+n_A &= \text{rev/min of arm}
+\end{align*}
+
 ** Equations
 \setcounter{eqnsec}{13}
 \setcounter{equation}{0}
@@ -313,6 +344,50 @@ N_p &= \text{Number of pinion teeth} \\
 k &= \text{1 for full-depth teeth, 0.8 for stub teeth} \\
 \phi &= \text{pressure angle} \\
 \end{align*}
+
+\setcounter{eqnsec}{13}
+\setcounter{equation}{33}
+\begin{equation}
+V = \pi d n / 12
+\end{equation}
+\myequations{Pitch line velocity $V$}{699}
+
+Where:
+\begin{align*}
+V &= \text{pitch-line velocity, ft/min} \\
+d &= \text{gear diameter, in} \\
+n &= \text{gear speed, rev/min}
+\end{align*}
+
+\setcounter{eqnsec}{13}
+\setcounter{equation}{34}
+\begin{equation}
+W_t = 33000 \frac{H}{V}
+\end{equation}
+\myequations{Transmitted load $W_t$ (Imperial units)}{699}
+
+Where:
+\begin{align*}
+W_t &= \text{transmitted load, lbf} \\
+H &= \text{power, hp} \\
+V &= \text{pitch-line velocity, ft/min}
+\end{align*}
+
+\setcounter{eqnsec}{13}
+\setcounter{equation}{35}
+\begin{equation}
+W_t = \frac{60000H}{\pi d n}
+\end{equation}
+\myequations{Transmitted load $W_t$ (SI units)}{699}
+
+Where:
+\begin{align*}
+W_t &= \text{transmitted load, lbf} \\
+H &= \text{power, kW} \\
+d &= \text{gear diameter, mm} \\
+n &= \text{speed, rev/min}
+\end{align*}
+
 * Power Screws
 ** Equations
 \setcounter{eqnsec}{8}
@@ -334,12 +409,11 @@ Where:
 T_R &= \text{Torque required to raise load} \\
 T_L &= \text{Torque required to lower load} \\
 f &= \text{Friction factor between screw and nut} \\
-d_m &= \text{Average diameter of screw}
+d_m &= \text{Average diameter of screw} \\
 F &= \text{Compressive force on screw} \\
-l &= \text{Screw lead}
+l &= \text{Screw lead} \\
 \lambda &= \text{Lead angle}
 \end{align*}
-
 
 * Belts
 ** Flat Belts
@@ -349,6 +423,60 @@ l &= \text{Screw lead}
 #+ATTR_LATEX: :width 0.6\textwidth :placement [H]
 #+CAPTION: Tension profile for a flat belt drive (pg. 887)
 [[file:res/flat_belt_tensions.svg]]
+*** Steps to solve
+See pg.880 for more details.
+**** Find $\exp{(f\phi)}$ from belt-drive geometry and friction
+\setcounter{eqnsec}{17}
+\setcounter{equation}{6}
+\begin{equation}
+\frac{F_1 - m r^2 \omega^2}{F_2 - m r^2 \omega^2}
+=
+\frac{F_1 - F_c}{F_2 - F_c}
+=
+\exp{(f \phi)}
+\end{equation}
+\myequations{Belting Equation}{877}
+
+\begin{align*}
+V &= \pi d n/12 \text{\hspace{2cm}ft/min} \\
+F_c &= \frac{w}{g}\left(\frac{V}{60}\right)^2
+= \frac{w}{32.17}\left(\frac{V}{60}\right)^2
+\end{align*}
+\myequations{Centripetal force $F_c$}{877}
+
+Where:
+\begin{align*}
+m &= \text{Belt mass per unit length} \\
+f &= \text{Belt friction factor} \\
+\phi &= \text{Belt wrap angle} \\
+F_c &= \text{Centripetal force}
+\end{align*}
+**** From belt geometry and speed find $F_c$
+**** From $T = 63025H_\text{nom}K_i n_d/n$ find necessary torque
+**** From Tables 17-2 and 17-4 and Eq. (17-2) determine $(F_1)_a$.
+\setcounter{eqnsec}{17}
+\setcounter{equation}{11}
+\begin{equation}
+(F_1)_a = b F_a C_p C_v
+\end{equation}
+\myequations{Allowable largest tension $(F_1)_a$}{880}
+
+Where:
+\begin{align*}
+(F_1)_a &= \text{allowable largest tension, lbf} \\
+b &= \text{belt width, in} \\
+F_a &= \text{manufacturer's allowed tension, lbf/in} \\
+C_p &= \text{pulley correction factor (Table 17-4), (pg. 882)} \\
+C_v &= \text{velocity correction factor}
+\end{align*}
+**** Find $F_2$ from $(F_1)_a - [(F_1)_a - F_2]$
+**** From Eq. (i) (pg. 878) find the necessary initial tension $F_i$
+Also see \autoref{eq:F_i} on page \pageref{eq:F_i}
+**** Check friction development $f' < f$. Use Eq. (17-7) solved for $f'$
+\begin{equation*}
+f' = \frac{1}{\phi} \ln \frac{(F_1)_a - F_c}{F_2 - F_c}
+\end{equation*}
+**** Find factor of safety from $n_{fs} = H_a/(H_\text{nom} K_s)$
 *** Equations
 \setcounter{eqnsec}{17}
 \setcounter{equation}{0}
@@ -356,7 +484,7 @@ l &= \text{Screw lead}
 \begin{split}
 \theta_d &= \pi - 2 \sin^{-1}\left(\frac{D - d}{2C}\right) \\
 \theta_D &= \pi + 2 \sin^{-1}\left(\frac{D - d}{2C}\right)
-\end{split}
+\end{split} \\
 L &= \left[4C^2 - (D - d)^2\right]^{1/2} + \frac{1}{2}(D\theta_D + d\theta_d)
 \end{align}
 \myequations{Common open belt geometry relations}{678}
@@ -383,7 +511,34 @@ L &= \text{Belt length}
 #+ATTR_LATEX: :width 0.6\textwidth :placement [H]
 #+CAPTION: Tension profile for a V-belt drive (pg. 895)
 [[file:res/v_belt_tensions.svg]]
+*** Steps to solve
+See pg. 897 for more details.
+**** Find $V$, $L_p$, $C$, $\phi$, and $\exp{(0.5123\phi)}$
+See pg. 892 for $L_p$ and $C$jj
+**** Find $H_d$, $H_a$, and $N_b$ from $H_d/H_a$ and round up
+**** Find $F_c$, $\Delta F$, $F_1$, $F_2$, and $F_i$, and $n_{fs}$
+**** Find belt life in number of passes, or hours if possible
 ** Equations
+\setcounter{eqnsec}{17}
+\setcounter{equation}{24}
+\begin{equation}
+F_i = \frac{F_1 + F_2}{2} - F_c \label{eq:F_i}
+\end{equation}
+\myequations{Initial belt tension $F_i$}{895}
+
+\begin{align*}
+F_1 - F_2 &= \frac{2T}{d} \\
+T &= \frac{d}{2}(F_1 - F_2) = \frac{d}{2} \Delta F
+\end{align*}
+\myequations{Torque transmited to a pulley}{877}
+
+Where:
+\begin{align*}
+F_c &= \text{Centripetal force} \\
+F_1 &= \text{Force at one side of pulley} \\
+F_2 &= \text{Force at other side of pulley} \\
+\end{align*}
+
 \begin{equation*}
 H_d = \frac{H_\text{nom} K_s n_d}{N_b}
 \end{equation*}
@@ -402,9 +557,44 @@ N_b &= \text{Number of belts} \\
 - 17 teeth on the driving sprocket is a good start
 - Odd number of teeth on driving sprocket, even number of pitches on chain
 - Lubrication can increase life by up to 300 times
+- Design such that $H_a \geq H_d$
+** Failure modes
+- Link-plate fatigue failure: use pre-extreme horsepower
+- Roller fatigue failure: use pre-extreme horsepower
+** Equations
+\setcounter{eqnsec}{17}
+\setcounter{equation}{37}
+\begin{equation}
+H_a = K_1 K_2 H_\text{tab}
+\end{equation}
+\myequations{Allowable chain power transmission $H_a$}{906}
+
+Where:
+\begin{align*}
+H_a &= \text{Allowable power transmission through the chain} \\
+H_\text{tab} &= \text{Rated power capacity of chain (Table 17-20), (pg. 903)} \\
+K_1 &= \text{Correction factor for tooth number other than 17 (Table 17-22), (pg. 905)} \\
+K_2 &= \text{Strand correction factor (Table 17-23), (pg. 905)}
+\end{align*}
+
+\setcounter{eqnsec}{17}
+\setcounter{equation}{37}
+\begin{equation}
+H_d = H_\text{nom} K_s n_d
+\end{equation}
+\myequations{Chain design power $H_d$}{906}
+
+Where:
+\begin{align*}
+H_d &= \text{Design power} \\
+H_\text{nom} &= \text{Nominal power transfer} \\
+K_s &= \text{Service factor} \\
+n_d &= \text{Design factor}
+\end{align*}
+
 * Wire Rope
 ** Design Considerations
-- Use a safety factor of 5 for general applications, 8 or 9 for safety critical applications
+- Use a safety factor of 5 for general applications, 8 or 9 for safety critical applications, see Table 17-25 (pg. 910) for more details.
 * Misc
 ** Galling
 Some metals (titanium, aluminium) can weld together when pressed together.
