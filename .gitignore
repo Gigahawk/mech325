@@ -1,1 +1,9 @@
 **/*.pdf
+**/*.fuse_hidden*
+**/*~
+**/#*#
+**/*.tex
+**/*.equ
+**/_minted*
+**/ltximg
+**/svg-inkscape
