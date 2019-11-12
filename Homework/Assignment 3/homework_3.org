@@ -1,0 +1,496 @@
+#+TITLE: MECH 325 Homework Assignment #3
+#+AUTHOR: Jasper Chan - 37467164
+#+LATEX_HEADER: \usepackage[scr]{rsfso}
+#+LATEX_HEADER: \newcommand{\laplace}{\mathscr{L}}
+#+LATEX_HEADER: \sisetup{inter-unit-product=\cdot}
+#+LATEX_HEADER: \sisetup{per-mode=symbol}
+#+LATEX_HEADER: \DeclareSIUnit\rev{rev}
+#+LATEX_HEADER: \DeclareSIUnit\inch{in}
+#+LATEX_HEADER: \DeclareSIUnit\foot{ft}
+#+LATEX_HEADER: \DeclareSIUnit\teeth{teeth}
+#+LATEX_HEADER: \DeclareSIUnit\horsepower{hp}
+#+LATEX_HEADER: \DeclareSIUnit\lbf{lbf}
+#+LATEX_HEADER: \DeclareSIUnit\psi{psi}
+#+LATEX_HEADER: \DeclareSIUnit\btu{Btu}
+#+LATEX_HEADER: \DeclareSIUnit\degF{\degree F}
+#+OPTIONS: toc:nil
+
+#+BEGIN_SRC ipython :session :results none :exports none
+import pint
+import numpy as np
+from sympy import *
+
+ureg = pint.UnitRegistry()
+ureg.default_format = '~.3f'
+Q_ = ureg.Quantity
+#+END_SRC
+
+* Problem 1
+# Problem 12-22 in Shigley's 10th Edition
+An Oiles SP 500 alloy brass bushing is \SI{0.75}{\inch} long with a \SI{0.75}{\inch} dia bore and operates in a clean environment at \SI{70}{\degF}.
+The allowable wear without loss of function is \SI{0.004}{\inch}.
+The radial load is \SI{400}{\lbf}.
+The shaft speed is \SI{250}{\rev\per\min}.
+Estimate the number of revolutions for radial wear to be \SI{0.004}{\inch}.
+
+We are given the following:
+- $L = \SI{0.75}{\inch}$
+- $D = \SI{0.75}{\inch}$
+- $T_{\infty} = \SI{70}{\degF}$
+- $w = \SI{0.004}{\inch}$
+- $F = \SI{400}{\lbf}$
+- $N = \SI{250}{\rev\per\min}$
+
+We can determine:
+- Wear Factor[fn:wear_factor]: $K = \SI[parse-numbers=false]{0.6(10^{-10})}{\inch\cubed\minute\per\lbf\per\foot\per\hour}$
+- Limiting $PV$[fn:service_range]: $PV < \SI{46700}{\psi\foot\per\minute}$
+- Characteristic Pressure[fn:service_range]: $P_\text{max} < \SI{3560}{\psi}$
+- Max Velocity[fn:service_range]: $V_\text{max} < \SI{100}{\foot\per\minute}$
+- Max Temp[fn:service_range]: $T_\text{max} < \SI{300}{\degF}$
+
+[fn:wear_factor] Taken from Table 12-8 in Shigley's 10th Ed.
+[fn:service_range] Taken from Table 12-12 in Shigley's 10th Ed.
+
+
+
+
+From Equation (12-31):
+\begin{align*}
+P_\text{max} &= \frac{4}{\pi} \frac{F}{DL}
+\end{align*}
+#+BEGIN_SRC ipython :session :results output :exports both
+F = 400 * ureg.lbf
+D = 0.75 * ureg.inch
+L = 0.75 * ureg.inch
+
+P_max = 4/np.pi * F/(D*L)
+P_max_ok = P_max < 3560 * ureg.psi
+print(f"{P_max.to(ureg.psi)} < {3560 * ureg.psi}: {P_max_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 905.415 psi < 3560.000 psi: True
+
+From Equation (12-28):
+\begin{align*}
+P &= \frac{F}{DL}
+\end{align*}
+#+BEGIN_SRC ipython :session :results output :exports both
+P = F/(D*L)
+print(P.to(ureg.psi))
+#+END_SRC
+
+#+RESULTS:
+: 711.111 psi
+
+From Equation (12-29):
+\begin{align*}
+V &= \frac{\pi D N}{12}
+\end{align*}
+#+BEGIN_SRC ipython :session :results output :exports both
+N = 250 * ureg.rpm
+V = np.pi * D.magnitude * N.magnitude/12 * ureg.ft/ureg.minute
+V_ok = V < 100 * ureg.ft/ureg.minute
+print(f"{V} < {100 * ureg.ft/ureg.minute}: {V_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 49.087 ft / min < 100.000 ft / min: True
+
+We can now check if our $PV$ is below the limiting $PV$:
+#+BEGIN_SRC ipython :session :results output :exports both
+PV = P*V
+PV_ok = PV < 46700 * ureg.psi * ureg.ft / ureg.minute
+
+print(f"{PV.to(ureg.psi*ureg.ft/ureg.minute)} < {46700 * ureg.psi * ureg.ft / ureg.minute}: {PV_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 34906.585 ft * psi / min < 46700.000 ft * psi / min: True
+
+We can find $f_1$ by interpolating Table 12-10 of Shigley's 10th Ed:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+f_1 = np.interp(V.magnitude, [33, 100], [1.3, 1.8])
+f"f_1 = {f_1:.3f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[85]:
+: 'f_1 = 1.420'
+:END:
+
+and $f_2$ from Table 12-11:
+#+BEGIN_SRC ipython :session :results silent
+f_2 = 1.0
+#+END_SRC
+
+We can rearrange Equation (12-32) to solve for time $t$:
+\begin{equation*}
+t = \frac{w}{f_1 f_2 K P_\text{max} V}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results output :exports both
+K = 0.6*10**-10 * ureg.inch**3 * ureg.minute /(ureg.lbf * ureg.ft * ureg.hour)
+w = 0.004 * ureg.inch
+t = w/(f_1*f_2*K*P_max*V)
+print(t)
+#+END_SRC
+
+#+RESULTS:
+: 1056.297 hr
+
+Calculating number of cycles:
+#+BEGIN_SRC ipython :session :results output :exports both
+print(f"{(N*t).to(ureg.revolutions):.3e}")
+#+END_SRC
+
+#+RESULTS:
+: 1.584e+07 turn
+
+* Problem 2
+# Problem 12-23 in Shigley's 10th Edition
+Choose an Oiles SP 500 alloy brass bushing to give a
+maximum wear of \SI{0.002}{\inch}
+for \SI{1000}{\hour} of use
+with a \SI{200}{\rev\per\minute} journal and
+\SI{100}{\lbf} radial load.
+Use $\hbar_\text{CR} = \SI{2.7}{\btu\per\hour\per\foot\squared\per\degF}$,
+$T_\text{max} = \SI{300}{\degF}$,
+$f_s = 0.03$,
+and a design factor $n_d = 2$.
+The bearing is to operate in a clean environment at $\SI{70}{\degF}$.
+Table 12-13 lists the bushing sizes available from the manufacturer.
+
+Rearranging Equation (12-38) to solve for length $L$:
+\begin{equation*}
+L = \frac{
+  720 f_s F N
+}{
+  J \hbar_\text{CR} \left(T_f - T_\infty\right)
+}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer
+n_d = 2
+F = 100 # lbf
+F_d = n_d * F # Use design force instead of nominal
+N = 200 # rpm
+f_s = 0.03
+hbar_CR = 2.7 # Btu/(h*ft^2*degF)
+T_f = 300 # degF
+T_inf = 70 # degF
+
+# Joulean heat equivalent
+J = 778 # ft*lbf/Btu  (Number is for common petroleum lubricants, pg. 635)
+
+L = (720*f_s*F_d*N)/(J*hbar_CR*(T_f - T_inf))
+f"{L:.2f} in"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[165]:
+: '1.79 in'
+:END:
+
+From Table 12-13, the smallest bushing with $L > \SI{1.79}{\inch}$:
+\begin{align*}
+\text{ID} &= \SI{1}{\inch} \\
+\text{OD} &= \SI{1.375}{\inch} \\
+L &= \SI{2}{\inch}
+\end{align*}
+
+From Equation (12-33), this bushing has safe dimensions
+\begin{equation*}
+0.5 \leq L/D \leq 2
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+L = 2
+ID = 1
+OD = 1.375
+0.5 <= L/ID <= 2
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[166]:
+: True
+:END:
+
+Now we an check that this bushing passes our requirements.
+#+BEGIN_SRC ipython :session :results output :exports both
+P_max = 4/np.pi * F_d/(ID*L)
+P_max_ok = P_max < 3560
+print(f"{P_max:.3f} psi < 3560 psi: {P_max_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 127.324 psi < 3560 psi: True
+
+#+BEGIN_SRC ipython :session :results output :exports both
+P = F_d/(ID*L)
+print(f"{P} psi")
+#+END_SRC
+
+#+RESULTS:
+: 100.0 psi
+
+#+BEGIN_SRC ipython :session :results output :exports both
+V = np.pi * ID * N/12 # ft/min
+V_ok = V < 100 
+print(f"{V:.3f} ft/min < 100 ft/min: {V_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 52.360 ft/min < 100 ft/min: True
+
+#+BEGIN_SRC ipython :session :results output :exports both
+PV = P*V
+PV_ok = PV < 46700 # psi * ft/min
+
+print(f"{PV:.3f} psi*ft/min < 46700 psi*ft/min: {PV_ok}")
+#+END_SRC
+
+#+RESULTS:
+: 5235.988 psi*ft/min < 46700 psi*ft/min: True
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+f_1 = np.interp(V, [33, 100], [1.3, 1.8])
+f"f_1 = {f_1:.3f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[172]:
+: 'f_1 = 1.444'
+:END:
+
+#+BEGIN_SRC ipython :session :results silent
+f_2 = 1.0
+#+END_SRC
+
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+t = 1000 # hours
+w = (f_1*f_2*K.magnitude*F_d*N*t)/(2*L)
+w_ok = w < 0.001
+f"{w:.2e} in < 0.001 in: {w_ok}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[177]:
+: '8.67e-04 in < 0.001 in: True'
+:END:
+
+* 
+# Problem 11-2 in Shigley's 10th Edition
+An angular-contact, inner ring rotating, 02-series ball bearing is requiredfor an application in which the life requirement is \SI{40}{\kilo\hour} at \SI{520}{\rev\per\minute}.
+The design radial load is \SI{725}{\lbf}.
+The application factor is 1.4.
+The reliability goal is 0.90.
+Find the multiple of rating life $x_D$ required for the catalog rating $C_{10}$ with which to enter Table 11-2.
+Choose a bearing and estimate the existing reliability in service.
+
+From Example 11-3:
+\begin{equation*}
+x_D = \frac{L_D}{L_R} = \frac{60 \laplace_D n_D}{L_{10}}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+L_D = 40000 # h
+n_D = 520 # rpm
+L_10 = 10**6 # revs
+
+x_D = 60*L_D*n_D/L_10
+x_D
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[214]:
+: 1248.0
+:END:
+
+From Equation (11-9):
+\begin{equation*}
+C_{10} = a_f F_D \left[
+  \frac{
+    x_D
+  }{
+    x_0 +
+    \left(\theta - x_0\right)
+    \left[\ln(1/R_D)\right]^{1/b}
+  }
+\right]^{1/a}
+\end{equation*}
+
+From Chapter 11-3 and Table 11-6, we can find:
+\begin{align*}
+a &= 3 &
+x_0 &= 0.02 &
+\theta &= 4.459 &
+b &= 1.483
+\end{align*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+a = 3
+b = 1.483
+x_0 = 0.02
+theta = 4.459
+F_D = 725 # lbf
+a_f = 1.4
+R_D = 0.9
+
+C_10 = a_f*F_D*(x_D/(x_0 + (theta - x_0)*(np.log(1/R_D))**(1/b)))**(1/a) *ureg.lbf
+C_10 = C_10.to(ureg.kN).magnitude
+
+f"{C_10:.3f} kN"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[318]:
+: '48.718 kN'
+:END:
+
+The bearing with the next highest load is $C_{10} = \SI{55.9}{\kilo\newton}$.
+From Equation (11-21):
+\begin{equation*}
+R = \exp\left(
+  - \left\{
+    \frac{
+      x_D \left(
+        \frac{a_F F_D}{C_{10}}
+      \right)^a
+      - x_0
+    }{
+      \theta - x_0
+    }
+  \right\}^b
+\right)
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+C_10 = 55.9 # kN
+F_D_kN = (F_D * ureg.lbf).to(ureg.kN).magnitude
+R = np.exp(
+    -((x_D*(a_f*F_D_kN/C_10)**a - x_0)/ \
+     (theta - x_0))**b
+    )
+f"R = {R:.3f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[334]:
+: 'R = 0.945'
+:END:
+* Problem 4
+# Problem 11-21 in Shigley's 10th Edition
+An 02-series single-row deep-groove ball bearing with a \SI{30}{\milli\meter} bore (see Tables 11-1 and 11-2 for specification) is loaded with a \SI{2}{\kilo\newton} axial load and a \SI{5}{\kilo\newton} radial load.
+The inner ring rotates at \SI{400}{\rev\per\minute}.
+** 
+Determine the equivalent radial load that will be experience by this particular bearing.
+
+From Table 11-2:
+\begin{align*}
+C_{10} &= \SI{19.5}{\kilo\newton} &
+C_0 &= \SI{10}{\kilo\newton}
+\end{align*}
+
+Calculating $F_a/C_0$ for Table 11-1:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+F_a = 2 # kN
+C_0 = 10 # kN
+idx = F_a/C_0
+idx
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[377]:
+: 0.2
+:END:
+
+From Table 11-1, $e \epsilon [0.34, 0.38]$.
+Calculating $F_a/(V F_r)$ to figure out which columns to use:
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+V = 1 # inner ring rotating
+F_r = 5 # kN
+idx2 = F_a/(V*F_r)
+idx2
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[378]:
+: 0.4
+:END:
+
+This is greater than our range for $e$, hence we use the second set of columns.
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+X = np.interp(idx, [0.17, 0.28], [0.56, 0.56])
+Y = np.interp(idx, [0.17, 0.28], [1.31, 1.15])
+f"X = {X:.3f}, Y = {Y:.3f}"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[382]:
+: 'X = 0.560, Y = 1.266'
+:END:
+
+From Equation (11-12):
+\begin{equation*}
+F_e = X V F_r + Y F_a
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+F_e = X*V*F_r + Y*F_a
+f"{F_e:.3f} kN"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[383]:
+: '5.333 kN'
+:END:
+
+** 
+Determine the predicted life (in revolutions) that this bearing could be expected to give in this application with a 99 percent reliabililty.
+
+Solving Equation (11-9) for $x_D$:
+\begin{equation*}
+x_D = \left(
+  \frac{
+    C_{10}
+  }{
+    a_f F_D
+  }
+\right)^a
+\left[
+  x_0 + (\theta - x_0)(\ln(1/R_D))
+\right]^{1/b}
+\end{equation*}
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+a_f = 1
+F_D = F_e
+R_D = 0.99
+C_10 = 19.5 # kN
+
+x_D = (C_10/(a_f*F_D))**a * (x_0 + (theta - x_0)*(np.log(1/R_D))**(1/b))
+x_D
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[395]:
+: 10.736616402457797
+:END:
+
+Multiply by $L_R = L_{10}$ to get the life in revolutions
+#+BEGIN_SRC ipython :session :results raw drawer :exports both
+L_D = x_D * L_10
+f"{L_D:.3e} revs"
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# Out[423]:
+: '1.074e+07 revs'
+:END:
